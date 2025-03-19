@@ -1,6 +1,9 @@
 import { box, randomBytes } from 'tweetnacl';
 import { decodeUTF8, encodeUTF8, encodeBase64, decodeBase64 } from 'tweetnacl-util';
 
+// Check if code is running in browser environment
+const isBrowser = typeof window !== 'undefined';
+
 // Generate a new key pair for encryption
 export const generateKeyPair = () => {
     const keyPair = box.keyPair();
@@ -12,16 +15,30 @@ export const generateKeyPair = () => {
 
 // Store keys securely in localStorage
 export const storeKeyPair = (keyPair: { publicKey: string; secretKey: string }, serverId?: string) => {
-    const storageKey = serverId ? `encryption_keys_${serverId}` : 'encryption_keys_default';
-    localStorage.setItem(storageKey, JSON.stringify(keyPair));
+    if (!isBrowser) return; // Skip localStorage operations on server
+    
+    try {
+        const storageKey = serverId ? `encryption_keys_${serverId}` : 'encryption_keys_default';
+        localStorage.setItem(storageKey, JSON.stringify(keyPair));
+    } catch (error) {
+        console.error('Error storing key pair:', error);
+        // Fail silently in production
+    }
 };
 
 // Retrieve keys from localStorage
 export const getKeyPair = (serverId?: string) => {
-    const storageKey = serverId ? `encryption_keys_${serverId}` : 'encryption_keys_default';
-    const storedKeys = localStorage.getItem(storageKey);
-    if (!storedKeys) return null;
-    return JSON.parse(storedKeys) as { publicKey: string; secretKey: string };
+    if (!isBrowser) return null; // Return null on server
+    
+    try {
+        const storageKey = serverId ? `encryption_keys_${serverId}` : 'encryption_keys_default';
+        const storedKeys = localStorage.getItem(storageKey);
+        if (!storedKeys) return null;
+        return JSON.parse(storedKeys) as { publicKey: string; secretKey: string };
+    } catch (error) {
+        console.error('Error retrieving key pair:', error);
+        return null;
+    }
 };
 
 // Encrypt a message using the recipient's public key and sender's secret key
@@ -142,25 +159,36 @@ export const rotateKeyPair = (currentKeyPair: { publicKey: string; secretKey: st
     // Generate a new key pair
     const newKeyPair = generateKeyPair();
     
-    // Store the new key pair as the primary keys
-    storeKeyPair(newKeyPair);
-    
-    // Store the old key pair with a backup identifier
-    const backupStorageKey = `encryption_keys_backup_${Date.now()}`;
-    localStorage.setItem(backupStorageKey, JSON.stringify(currentKeyPair));
+    if (isBrowser) {
+        // Store the new key pair as the primary keys
+        storeKeyPair(newKeyPair);
+        
+        // Store the old key pair with a backup identifier
+        try {
+            const backupStorageKey = `encryption_keys_backup_${Date.now()}`;
+            localStorage.setItem(backupStorageKey, JSON.stringify(currentKeyPair));
+        } catch (error) {
+            console.error('Error storing backup keys:', error);
+        }
+    }
     
     return newKeyPair;
 };
 
 // Get multiple public keys for a user from the database (to handle key rotation)
 export const getPublicKeysForUser = async (userId: string, supabase: any) => {
-    const { data, error } = await supabase
-        .from('public_keys')
-        .select('public_key, key_type, created_at')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
+    try {
+        const { data, error } = await supabase
+            .from('public_keys')
+            .select('public_key, key_type, created_at')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false });
+            
+        if (error) throw error;
         
-    if (error) throw error;
-    
-    return data || [];
+        return data || [];
+    } catch (error) {
+        console.error('Error fetching public keys:', error);
+        return [];
+    }
 };
