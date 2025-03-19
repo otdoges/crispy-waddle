@@ -609,7 +609,7 @@ const createKeyFromPassword = (password: string) => {
   
   // Fill the key with password data (with repetition if needed)
   for (let i = 0; i < key.length; i++) {
-    key[i] = passwordData[i % passwordData.length];
+    key[i] = passwordData[i % passwordData.length] ?? 0;
   }
   
   return encodeBase64(key);
