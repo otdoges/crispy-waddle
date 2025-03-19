@@ -1,29 +1,90 @@
-# Create T3 App
+# SecureChat - End-to-End Encrypted Messaging
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+SecureChat is a modern, secure messaging platform that prioritizes user privacy through end-to-end encryption. Every message is encrypted locally before transmission and can only be decrypted by the intended recipient.
 
-## What's next? How do I make an app with this?
+![SecureChat Screenshot](https://via.placeholder.com/800x450.png?text=SecureChat+Screenshot)
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+## Features
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+### Privacy & Security
+- 🔐 **True End-to-End Encryption** - Messages are encrypted before leaving your device
+- 🔑 **Unique Encryption Keys** - Each user has their own encryption key pair
+- 🚫 **Zero Knowledge Architecture** - We can't read your messages, even if we wanted to
+- 💾 **Local Key Storage** - Encryption keys never leave your device
+- 🔄 **Key Rotation** - Regularly change encryption keys for enhanced security
+- 🧩 **XChaCha20-Poly1305 Encryption** - Military-grade encryption algorithm
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+### User Experience
+- 💬 **Real-time Messaging** - Instant message delivery with read receipts
+- 👥 **Secure Group Chats** - Create encrypted conversations with multiple participants
+- 🖼️ **Media Sharing** - Send encrypted images, videos, and files
+- 🌙 **Dark Mode** - Easy on the eyes, particularly in low-light environments
+- 📱 **Responsive Design** - Works on desktop, tablet, and mobile devices
+- ✨ **Smooth Animations** - Polished user experience with fluid transitions
 
-## Learn More
+### Technical Highlights
+- ⚡ **tRPC Integration** - Type-safe API calls for improved performance and reliability
+- 🧱 **Next.js Architecture** - Modern React framework with server-side rendering
+- 🔄 **Supabase Backend** - Secure, scalable database and authentication
+- 🧠 **TypeScript** - Type safety throughout the codebase
+- 📦 **PNPM Workspaces** - Efficient package management
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+## Getting Started
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+### Prerequisites
+- Node.js (v16+)
+- PNPM package manager
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+### Installation
 
-## How do I deploy this?
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/encrypted-messaging-app.git
+cd encrypted-messaging-app
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+# Install dependencies
+pnpm install
+
+# Set up environment variables
+cp .env.example .env.local
+# Edit .env.local with your configuration
+
+# Start the development server
+pnpm dev
+```
+
+### Environment Variables
+
+Create a `.env.local` file with the following variables:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+NEXT_PUBLIC_APP_NAME=SecureChat
+NEXT_PUBLIC_PASSWORD_MIN_LENGTH=12
+```
+
+## Security Model
+
+SecureChat uses a comprehensive security approach:
+
+1. **Client-Side Key Generation**: Encryption keys are generated in the browser using Web Crypto API
+2. **Unique Key Pairs**: Each user has a unique public/private key pair
+3. **Local Storage Only**: Private keys never leave the client device
+4. **Message Encryption**: Each message is encrypted with the recipient's public key
+5. **Multiple Device Support**: Secure key synchronization between user devices
+6. **Forward Secrecy**: Regular key rotation prevents decryption of past messages if keys are compromised
+7. **Zero Server Knowledge**: The server only stores encrypted data and cannot decrypt messages
+
+## Contributing
+
+We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for details.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Our security model is inspired by Signal's protocol
+- Special thanks to all the open-source libraries that make this project possible

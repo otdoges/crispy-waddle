@@ -181,7 +181,9 @@ export const getCurrentUser = async () => {
     const { data, error } = await supabase.auth.getUser();
     
     if (error) {
-      throw new AuthError(error.message, `auth/${error.name.toLowerCase().replace(/\s+/g, '-')}`);
+      // Instead of throwing an error, just log it and return null
+      console.error("Auth session error:", error.message);
+      return null;
     }
     
     return data?.user || null;
