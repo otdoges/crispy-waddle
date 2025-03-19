@@ -1,4 +1,4 @@
-\"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { redirect } from "next/navigation";
@@ -8,12 +8,16 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/comp
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Separator } from "~/components/ui/separator";
 import { getCurrentUser } from "~/lib/auth";
+import { createClient } from '@supabase/supabase-js';
+import { supabase } from "~/lib/supabase";
 
 interface Server {
     id: string;
     name: string;
     imageUrl: string | null;
 }
+
+// Remove direct initialization and use the imported supabase client
 
 export const NavigationSidebar = () => {
     const [currentUser, setCurrentUser] = useState<any>(null);
@@ -24,17 +28,23 @@ export const NavigationSidebar = () => {
         const fetchUser = async () => {
             const user = await getCurrentUser();
             setCurrentUser(user);
-            setIsLoading(false);
 
-            // In a real implementation, we would fetch the user's servers here
-            // For now, we'll use dummy data
             if (user) {
-                setServers([
-                    { id: "1", name: "General", imageUrl: null },
-                    { id: "2", name: "Gaming", imageUrl: null },
-                    { id: "3", name: "Development", imageUrl: null },
-                ]);
+                // Fetch servers from Supabase
+                const { data, error } = await supabase
+                    .from('servers')
+                    .select('id, name, image_url')
+                    .eq('owner_id', user.id)
+                    .order('created_at', { ascending: true });
+
+                if (!error && data) {
+                    setServers(data.map(server => ({
+                        ...server,
+                        imageUrl: server.image_url
+                    })));
+                }
             }
+            setIsLoading(false);
         };
 
         fetchUser();

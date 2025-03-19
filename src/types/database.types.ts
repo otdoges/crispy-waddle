@@ -79,6 +79,7 @@ export interface Database {
                     deleted: boolean;
                     file_url: string | null;
                     encrypted_file_data: string | null;
+                    reply_to: string | null;
                 };
                 Insert: {
                     id?: string;
@@ -91,6 +92,7 @@ export interface Database {
                     deleted?: boolean;
                     file_url?: string | null;
                     encrypted_file_data?: string | null;
+                    reply_to?: string | null;
                 };
                 Update: {
                     id?: string;
@@ -103,6 +105,7 @@ export interface Database {
                     deleted?: boolean;
                     file_url?: string | null;
                     encrypted_file_data?: string | null;
+                    reply_to?: string | null;
                 };
             };
             server_members: {
@@ -143,6 +146,7 @@ export interface Database {
                     deleted: boolean;
                     file_url: string | null;
                     encrypted_file_data: string | null;
+                    reply_to: string | null;
                 };
                 Insert: {
                     id?: string;
@@ -155,6 +159,7 @@ export interface Database {
                     deleted?: boolean;
                     file_url?: string | null;
                     encrypted_file_data?: string | null;
+                    reply_to?: string | null;
                 };
                 Update: {
                     id?: string;
@@ -167,6 +172,7 @@ export interface Database {
                     deleted?: boolean;
                     file_url?: string | null;
                     encrypted_file_data?: string | null;
+                    reply_to?: string | null;
                 };
             };
             conversations: {
@@ -174,16 +180,19 @@ export interface Database {
                     id: string;
                     created_at: string;
                     encrypted_key_data: string | null;
+                    last_message_at: string;
                 };
                 Insert: {
                     id?: string;
                     created_at?: string;
                     encrypted_key_data?: string | null;
+                    last_message_at?: string;
                 };
                 Update: {
                     id?: string;
                     created_at?: string;
                     encrypted_key_data?: string | null;
+                    last_message_at?: string;
                 };
             };
             conversation_participants: {
@@ -193,6 +202,7 @@ export interface Database {
                     conversation_id: string;
                     user_id: string;
                     encrypted_key_data: string | null;
+                    muted: boolean;
                 };
                 Insert: {
                     id?: string;
@@ -200,6 +210,7 @@ export interface Database {
                     conversation_id: string;
                     user_id: string;
                     encrypted_key_data?: string | null;
+                    muted?: boolean;
                 };
                 Update: {
                     id?: string;
@@ -207,6 +218,7 @@ export interface Database {
                     conversation_id?: string;
                     user_id?: string;
                     encrypted_key_data?: string | null;
+                    muted?: boolean;
                 };
             };
             user_profiles: {
@@ -239,6 +251,194 @@ export interface Database {
                     custom_status?: string | null;
                     encrypted_status_data?: string | null;
                     updated_at?: string;
+                };
+            };
+            public_keys: {
+                Row: {
+                    id: string;
+                    created_at: string;
+                    user_id: string;
+                    public_key: string;
+                    key_type: 'PRIMARY' | 'BACKUP' | 'ROTATION';
+                    is_active: boolean;
+                    expires_at: string | null;
+                };
+                Insert: {
+                    id?: string;
+                    created_at?: string;
+                    user_id: string;
+                    public_key: string;
+                    key_type?: 'PRIMARY' | 'BACKUP' | 'ROTATION';
+                    is_active?: boolean;
+                    expires_at?: string | null;
+                };
+                Update: {
+                    id?: string;
+                    created_at?: string;
+                    user_id?: string;
+                    public_key?: string;
+                    key_type?: 'PRIMARY' | 'BACKUP' | 'ROTATION';
+                    is_active?: boolean;
+                    expires_at?: string | null;
+                };
+            };
+            user_devices: {
+                Row: {
+                    id: string;
+                    created_at: string;
+                    user_id: string;
+                    device_id: string;
+                    device_name: string;
+                    last_active: string;
+                    encrypted_device_key: string;
+                    push_token: string | null;
+                    is_trusted: boolean;
+                };
+                Insert: {
+                    id?: string;
+                    created_at?: string;
+                    user_id: string;
+                    device_id: string;
+                    device_name: string;
+                    last_active?: string;
+                    encrypted_device_key: string;
+                    push_token?: string | null;
+                    is_trusted?: boolean;
+                };
+                Update: {
+                    id?: string;
+                    created_at?: string;
+                    user_id?: string;
+                    device_id?: string;
+                    device_name?: string;
+                    last_active?: string;
+                    encrypted_device_key?: string;
+                    push_token?: string | null;
+                    is_trusted?: boolean;
+                };
+            };
+            message_reactions: {
+                Row: {
+                    id: string;
+                    created_at: string;
+                    message_id: string;
+                    user_id: string;
+                    emoji: string;
+                    encrypted_emoji_data: string | null;
+                };
+                Insert: {
+                    id?: string;
+                    created_at?: string;
+                    message_id: string;
+                    user_id: string;
+                    emoji: string;
+                    encrypted_emoji_data?: string | null;
+                };
+                Update: {
+                    id?: string;
+                    created_at?: string;
+                    message_id?: string;
+                    user_id?: string;
+                    emoji?: string;
+                    encrypted_emoji_data?: string | null;
+                };
+            };
+            message_read_status: {
+                Row: {
+                    id: string;
+                    created_at: string;
+                    message_id: string;
+                    user_id: string;
+                    read_at: string;
+                };
+                Insert: {
+                    id?: string;
+                    created_at?: string;
+                    message_id: string;
+                    user_id: string;
+                    read_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    created_at?: string;
+                    message_id?: string;
+                    user_id?: string;
+                    read_at?: string;
+                };
+            };
+            direct_message_reactions: {
+                Row: {
+                    id: string;
+                    created_at: string;
+                    direct_message_id: string;
+                    user_id: string;
+                    emoji: string;
+                    encrypted_emoji_data: string | null;
+                };
+                Insert: {
+                    id?: string;
+                    created_at?: string;
+                    direct_message_id: string;
+                    user_id: string;
+                    emoji: string;
+                    encrypted_emoji_data?: string | null;
+                };
+                Update: {
+                    id?: string;
+                    created_at?: string;
+                    direct_message_id?: string;
+                    user_id?: string;
+                    emoji?: string;
+                    encrypted_emoji_data?: string | null;
+                };
+            };
+            direct_message_read_status: {
+                Row: {
+                    id: string;
+                    created_at: string;
+                    direct_message_id: string;
+                    user_id: string;
+                    read_at: string;
+                };
+                Insert: {
+                    id?: string;
+                    created_at?: string;
+                    direct_message_id: string;
+                    user_id: string;
+                    read_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    created_at?: string;
+                    direct_message_id?: string;
+                    user_id?: string;
+                    read_at?: string;
+                };
+            };
+            server_verification: {
+                Row: {
+                    id: string;
+                    created_at: string;
+                    server_id: string;
+                    verification_status: 'PENDING' | 'VERIFIED' | 'REJECTED';
+                    verification_code: string | null;
+                    verified_at: string | null;
+                };
+                Insert: {
+                    id?: string;
+                    created_at?: string;
+                    server_id: string;
+                    verification_status?: 'PENDING' | 'VERIFIED' | 'REJECTED';
+                    verification_code?: string | null;
+                    verified_at?: string | null;
+                };
+                Update: {
+                    id?: string;
+                    created_at?: string;
+                    server_id?: string;
+                    verification_status?: 'PENDING' | 'VERIFIED' | 'REJECTED';
+                    verification_code?: string | null;
+                    verified_at?: string | null;
                 };
             };
         };
