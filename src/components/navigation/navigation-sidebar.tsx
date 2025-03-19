@@ -8,7 +8,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/comp
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Separator } from "~/components/ui/separator";
 import { getCurrentUser } from "~/lib/auth";
-import { createClient } from '@supabase/supabase-js';
 import { supabase } from "~/lib/supabase";
 
 interface Server {
@@ -16,8 +15,6 @@ interface Server {
     name: string;
     imageUrl: string | null;
 }
-
-// Remove direct initialization and use the imported supabase client
 
 export const NavigationSidebar = () => {
     const [currentUser, setCurrentUser] = useState<any>(null);
