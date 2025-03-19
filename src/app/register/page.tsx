@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import { useToast } from "~/components/ui/use-toast";
-import { Label } from "~/components/ui/label";
-import { registerUser, AuthError } from "~/lib/auth";
-import { isValidEmail } from "~/lib/utils";
-import { env } from "~/env";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { useToast } from "../../components/ui/toast";
+import { Label } from "../../components/ui/label";
+import { registerUser, AuthError } from "../../lib/auth";
+import { isValidEmail } from "../../lib/utils";
+import { env } from "../../env";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
