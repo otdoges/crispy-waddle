@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
-import { useToast } from "../../components/ui/toast";
+import { useToast } from "../../components/ui/use-toast";
 import { Label } from "../../components/ui/label";
 import { registerUser, AuthError } from "../../lib/auth";
 import { isValidEmail } from "../../lib/utils";
@@ -25,7 +25,7 @@ export default function RegisterPage() {
 
   // Get app name and password requirements from environment variables
   const APP_NAME = env.NEXT_PUBLIC_APP_NAME || "SecureChat";
-  const MIN_PASSWORD_LENGTH = env.PASSWORD_MIN_LENGTH || 8;
+  const MIN_PASSWORD_LENGTH = env.NEXT_PUBLIC_PASSWORD_MIN_LENGTH || 8;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

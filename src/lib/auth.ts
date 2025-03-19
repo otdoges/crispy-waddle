@@ -1,10 +1,14 @@
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { generateKeyPair, storeKeyPair } from "./encryption";
 import { env } from "../env";
+import { supabase as supabaseClient } from "./supabase";
 
-// Create a Supabase client for the browser
+// Create a Supabase client for the browser - with check for server-side
 const createClient = () => {
-  return createClientComponentClient();
+  if (typeof window === 'undefined') {
+    return supabaseClient; // Return the imported client on server
+  }
+  return createClientComponentClient(); // Create a client on browser
 };
 
 // Custom error class for auth errors

@@ -27,6 +27,7 @@ export const env = createEnv({
     NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
     NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string(),
     NEXT_PUBLIC_APP_NAME: z.string().default("SecureChat"),
+    NEXT_PUBLIC_PASSWORD_MIN_LENGTH: z.string().transform((s) => parseInt(s, 10)).default("8"),
   },
 
   /**
@@ -38,6 +39,7 @@ export const env = createEnv({
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     NEXT_PUBLIC_APP_NAME: process.env.APP_NAME,
+    NEXT_PUBLIC_PASSWORD_MIN_LENGTH: process.env.PASSWORD_MIN_LENGTH,
     ENCRYPTION_KEY_VERSION: process.env.ENCRYPTION_KEY_VERSION,
     SECURE_SESSION_SECRET: process.env.SECURE_SESSION_SECRET,
     AUTH_TOKEN_EXPIRY: process.env.AUTH_TOKEN_EXPIRY,
