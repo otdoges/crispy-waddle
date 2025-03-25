@@ -49,10 +49,15 @@ export const registerUser = async ({
       throw new AuthError("Username already taken", "auth/username-exists");
     }
 
-    // Register the user with Supabase Auth
+    // Register the user with Supabase Auth - no password validation
     const { data: authData, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          username: username
+        }
+      }
     });
 
     if (signUpError) {
