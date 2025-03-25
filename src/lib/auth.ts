@@ -138,21 +138,24 @@ export const loginUser = async ({
     });
 
     if (error) {
-      throw new AuthError(error.message, `auth/${error.name.toLowerCase().replace(/\s+/g, '-')}`);
+      // Handle specific auth errors
+      switch (error.name) {
+        case 'AuthInvalidCredentialsError':
+          return { error: 'Invalid email or password' };
+        case 'AuthUserNotFoundError':
+          return { error: 'User not found' };
+        case 'AuthEmailNotVerifiedError':
+          return { error: 'Please verify your email first' };
+        case 'AuthTooManyRequestsError':
+          return { error: 'Too many attempts. Please try again later' };
+        default:
+          return { error: 'Login failed. Please try again' };
+      }
     }
 
-    return data;
+    return { data };
   } catch (error) {
-    // Re-throw AuthError instances
-    if (error instanceof AuthError) {
-      throw error;
-    }
-    
-    console.error("Login error:", error);
-    throw new AuthError(
-      error instanceof Error ? error.message : "An unexpected error occurred during login",
-      "auth/login-failed"
-    );
+    return { error: 'An unexpected error occurred' };
   }
 };
 
