@@ -6,6 +6,7 @@ import { Emoji } from 'emoji-mart';
 import Image from 'next/image';
 import { useTheme } from '@/hooks/useTheme';
 import { useUser } from '@/hooks/useUser';
+import { SecureMessageAnimation } from './animations';
 
 interface MessageProps {
   id: string;
@@ -35,12 +36,15 @@ interface MessageProps {
     content: string;
     sender: string;
   };
+  isEncrypted?: boolean;
+  status?: 'sent' | 'delivered' | 'read';
 }
 
 const messageVariants = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, x: -20 }
+  initial: { opacity: 0, y: 20, scale: 0.95 },
+  animate: { opacity: 1, y: 0, scale: 1 },
+  exit: { opacity: 0, x: -20 },
+  hover: { scale: 1.02 }
 };
 
 const reactionVariants = {
@@ -58,7 +62,9 @@ export const EnhancedMessage: React.FC<MessageProps> = ({
   reactions,
   attachments,
   isEdited,
-  replyTo
+  replyTo,
+  isEncrypted = true,
+  status
 }) => {
   const { theme } = useTheme();
   const { user } = useUser();
@@ -78,18 +84,18 @@ export const EnhancedMessage: React.FC<MessageProps> = ({
     switch (contentType) {
       case 'text/markdown':
         return (
-          <ReactMarkdown className="prose dark:prose-invert">
+          <ReactMarkdown className="prose dark:prose-invert max-w-none">
             {content}
           </ReactMarkdown>
         );
       case 'text/x-url':
         return (
-          <div className="link-preview rounded-lg overflow-hidden">
+          <div className="link-preview rounded-lg overflow-hidden bg-zinc-800/50 p-3">
             {/* Link preview component */}
           </div>
         );
       default:
-        return <p className="text-gray-200">{content}</p>;
+        return <p className="text-gray-200 whitespace-pre-wrap">{content}</p>;
     }
   };
 
@@ -99,6 +105,7 @@ export const EnhancedMessage: React.FC<MessageProps> = ({
       initial="initial"
       animate="animate"
       exit="exit"
+      whileHover="hover"
       layout
       className={`message-container p-4 ${
         sender.id === user?.id ? 'ml-auto' : 'mr-auto'
@@ -112,79 +119,91 @@ export const EnhancedMessage: React.FC<MessageProps> = ({
         marginBottom: theme.spacing.gap
       }}
     >
-      {replyTo && (
-        <div className="reply-container text-sm text-gray-400 mb-2 border-l-2 border-primary pl-2">
-          <span className="font-medium">{replyTo.sender}</span>
-          <p className="truncate">{replyTo.content}</p>
-        </div>
-      )}
-
-      <div className="message-header flex items-center gap-2 mb-2">
-        <Image
-          src={sender.avatar}
-          alt={sender.name}
-          width={32}
-          height={32}
-          className="rounded-full"
-        />
-        <span className="font-medium text-gray-200">{sender.name}</span>
-        <span className="text-sm text-gray-400">
-          {format(timestamp, 'HH:mm')}
-        </span>
-        {isEdited && (
-          <span className="text-xs text-gray-400 italic">(edited)</span>
+      <SecureMessageAnimation isEncrypted={isEncrypted}>
+        {replyTo && (
+          <div className="reply-container text-sm text-gray-400 mb-2 border-l-2 border-primary pl-2">
+            <span className="font-medium">{replyTo.sender}</span>
+            <p className="truncate">{replyTo.content}</p>
+          </div>
         )}
-      </div>
 
-      <div className="message-content">{renderContent()}</div>
-
-      {attachments && attachments.length > 0 && (
-        <div className="attachments-container mt-2 grid grid-cols-2 gap-2">
-          {attachments.map((attachment) => (
-            <div
-              key={attachment.id}
-              className="attachment rounded-lg overflow-hidden"
-            >
-              {attachment.type.startsWith('image') ? (
-                <Image
-                  src={attachment.url}
-                  alt={attachment.name}
-                  width={200}
-                  height={200}
-                  className="object-cover"
-                />
-              ) : (
-                <div className="file-attachment p-2 bg-gray-700 rounded">
-                  <span>{attachment.name}</span>
-                </div>
-              )}
-            </div>
-          ))}
+        <div className="message-header flex items-center gap-2 mb-2">
+          <Image
+            src={sender.avatar}
+            alt={sender.name}
+            width={32}
+            height={32}
+            className="rounded-full"
+          />
+          <span className="font-medium text-gray-200">{sender.name}</span>
+          <span className="text-sm text-gray-400">
+            {format(timestamp, 'HH:mm')}
+          </span>
+          {isEdited && (
+            <span className="text-xs text-gray-400 italic">(edited)</span>
+          )}
         </div>
-      )}
 
-      <AnimatePresence>
-        {reactions.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="reactions-container mt-2 flex flex-wrap gap-1"
-          >
-            {reactions.map((reaction) => (
-              <motion.div
-                key={reaction.emoji}
-                variants={reactionVariants}
-                whileHover="hover"
-                className="reaction-badge flex items-center gap-1 bg-gray-700 rounded-full px-2 py-1"
+        <div className="message-content">{renderContent()}</div>
+
+        {attachments && attachments.length > 0 && (
+          <div className="attachments-container mt-2 grid grid-cols-2 gap-2">
+            {attachments.map((attachment) => (
+              <div
+                key={attachment.id}
+                className="attachment rounded-lg overflow-hidden"
               >
-                <Emoji emoji={reaction.emoji} size={16} />
-                <span className="text-sm">{reaction.count}</span>
-              </motion.div>
+                {attachment.type.startsWith('image') ? (
+                  <Image
+                    src={attachment.url}
+                    alt={attachment.name}
+                    width={200}
+                    height={200}
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="file-attachment p-2 bg-gray-700 rounded">
+                    <span>{attachment.name}</span>
+                  </div>
+                )}
+              </div>
             ))}
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
+
+        <AnimatePresence>
+          {reactions.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="reactions-container mt-2 flex flex-wrap gap-1"
+            >
+              {reactions.map((reaction) => (
+                <motion.div
+                  key={reaction.emoji}
+                  variants={reactionVariants}
+                  whileHover="hover"
+                  className="reaction-badge flex items-center gap-1 bg-gray-700 rounded-full px-2 py-1"
+                >
+                  <Emoji emoji={reaction.emoji} size={16} />
+                  <span className="text-sm">{reaction.count}</span>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {status && sender.id === user?.id && (
+          <div className="message-status mt-1 text-right">
+            <span className="text-xs text-gray-400">
+              {status === 'sent' && '✓'}
+              {status === 'delivered' && '✓✓'}
+              {status === 'read' && '✓✓'}
+            </span>
+          </div>
+        )}
+      </SecureMessageAnimation>
 
       <AnimatePresence>
         {isHovered && (
