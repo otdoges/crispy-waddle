@@ -181,14 +181,25 @@ export const getCurrentUser = async () => {
     const { data, error } = await supabase.auth.getUser();
     
     if (error) {
-      // Instead of throwing an error, just log it and return null
-      console.error("Auth session error:", error.message);
-      return null;
+      // Handle specific auth errors
+      switch (error.name) {
+        case 'AuthSessionMissingError':
+          // User is not logged in, this is expected when not authenticated
+          return null;
+        case 'AuthTokenExpiredError':
+          // Token expired, attempt to refresh
+          const { data: { session }, error: refreshError } = await supabase.auth.refreshSession();
+          if (refreshError) return null;
+          return session?.user || null;
+        default:
+          // For other auth errors, return null
+          return null;
+      }
     }
     
     return data?.user || null;
   } catch (error) {
-    console.error("Get current user error:", error);
+    // Handle any unexpected errors
     return null;
   }
 };

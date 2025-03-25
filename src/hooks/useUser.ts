@@ -61,7 +61,51 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
 
-      if (authError) throw authError;
+      if (authError) {
+        // Handle specific auth errors
+        switch (authError.name) {
+          case 'AuthSessionMissingError':
+            // User is not logged in, this is expected when not authenticated
+            setUser(null);
+            break;
+          case 'AuthTokenExpiredError':
+            // Token expired, attempt to refresh
+            const { data: { session }, error: refreshError } = await supabase.auth.refreshSession();
+            if (refreshError) {
+              setUser(null);
+              return;
+            }
+            if (session?.user) {
+              const { data: profile, error: profileError } = await supabase
+                .from('user_profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+
+              if (profileError) {
+                setUser(null);
+                return;
+              }
+
+              setUser({
+                id: session.user.id,
+                email: session.user.email!,
+                name: profile.name,
+                avatar_url: profile.avatar_url,
+                status: profile.status,
+                custom_status: profile.custom_status,
+                preferences: profile.preferences,
+                last_seen: new Date(profile.last_seen)
+              });
+            }
+            break;
+          default:
+            // For other auth errors, clear user state
+            setUser(null);
+        }
+        setLoading(false);
+        return;
+      }
 
       if (authUser) {
         const { data: profile, error: profileError } = await supabase
@@ -70,7 +114,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           .eq('id', authUser.id)
           .single();
 
-        if (profileError) throw profileError;
+        if (profileError) {
+          setUser(null);
+          setLoading(false);
+          return;
+        }
 
         setUser({
           id: authUser.id,
